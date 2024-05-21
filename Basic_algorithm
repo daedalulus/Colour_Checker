@@ -1,0 +1,97 @@
+// Change this sample colour to whatever colour you want to test the system with
+float sample_colour[3] = {100, 100, 100};
+
+// Database of RGB codes scanned from the cardboard swatches
+float RGB_codes[][3] = {
+  {0, 15, 40},
+  {141, 161, 219},
+  {106, 123, 182},
+  {0, 72, 77},
+  {6, 64, 43},
+  {0, 51, 54},
+  {137, 82, 119},
+  {77, 0, 37},
+  {147, 93, 145},
+  {65, 93, 43},
+  {80, 128, 139},
+  {83, 0, 0},
+  {164, 166, 204},
+  {234, 221, 207},
+  {215, 212, 219},
+  {206, 126, 182},
+  {225, 219, 224},
+  {107, 57, 117}
+};
+
+// The mixtures of paints for each cardboard swatch, IN THE SAME ORDER AS THE DATABASE OF RGB CODES
+char paint_codes[][4] = {
+  {'B', 'G', '\0', '\0'},
+  {'B', 'W', '\0', '\0'},
+  {'B', 'B', 'G', '\0'},
+  {'G', 'G', 'W', '\0'},
+  {'Y', 'G', 'G', '\0'},
+  {'G', '\0', '\0', '\0'},
+  {'W', 'W', 'R', '\0'},
+  {'R', 'G', '\0', '\0'},
+  {'R', 'Y', 'B', '\0'},
+  {'Y', 'Y', 'G', '\0'},
+  {'W', 'W', 'G', '\0'},
+  {'R', 'R', 'W', '\0'},
+  {'W', 'G', '\0', '\0'},
+  {'Y', '\0', '\0', '\0'},
+  {'Y', 'W', 'W', '\0'},
+  {'R', 'W', '\0', '\0'},
+  {'Y', 'W', '\0', '\0'},
+  {'R', 'B', '\0', '\0'}
+};
+
+float distance_between_two_3D_points(float left[3], float right[3]) {
+  return sqrt(
+    sq(left[0] - right[0])
+    + sq(left[1] - right[1])
+    + sq(left[2] - right[2])
+  );
+};
+
+int find_the_nearest_colour(float input[3], float list_of_RGB_codes[][3]) {
+  float best_distance_so_far = 10000;
+  float current_distance;
+  int index_of_closest_match;
+
+  for (int i = 0; i < 18; i++) {
+    current_distance = distance_between_two_3D_points(input, list_of_RGB_codes[i]);
+
+    if (current_distance < best_distance_so_far) {
+      best_distance_so_far = current_distance;
+      index_of_closest_match = i;
+    } else continue;
+  }
+
+  return index_of_closest_match;
+}
+
+void print_paint_code_from_index(int i, char list_of_paint_codes[][4]) {
+  Serial.println(list_of_paint_codes[i]);
+}
+
+void setup() {
+  Serial.begin(9600);
+}
+
+// Not currently using this function, left here for debugging purposes
+void print_code(float input[3]) {
+  Serial.print("RGB Code = ");
+  Serial.print(input[0]);
+  Serial.print(" ");
+  Serial.print(input[1]);
+   Serial.print(" ");
+  Serial.println(input[2]);
+}
+
+void loop() {
+  print_paint_code_from_index(
+    find_the_nearest_colour(sample_colour, RGB_codes)
+    , paint_codes
+  );
+  delay(3000);
+} 
